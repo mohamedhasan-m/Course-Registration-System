@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CourseHub | Courses</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    color: white;
+    background: #080b18;
+}
+
+.nav {
+    height: 75px;
+    padding: 0 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.logo span {
+    color: #818cf8;
+}
+
+.home {
+    color: #a5b4fc;
+    text-decoration: none;
+}
+
+.header {
+    max-width: 1100px;
+    margin: auto;
+    padding: 70px 25px 40px;
+}
+
+.header small {
+    color: #818cf8;
+    font-weight: 700;
+}
+
+.header h1 {
+    font-size: 50px;
+    margin: 12px 0;
+}
+
+.header p {
+    color: #9ca3af;
+}
+
+#loading {
+    text-align: center;
+    color: #9ca3af;
+    padding: 50px;
+}
+
+#error {
+    text-align: center;
+    color: #f87171;
+}
+
+#courses {
+    max-width: 1100px;
+    margin: auto;
+    padding: 0 25px 70px;
+
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(300px, 1fr));
+
+    gap: 22px;
+}
+
+.course {
+    padding: 28px;
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.025)
+        );
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    transition: .3s;
+}
+
+.course:hover {
+    transform: translateY(-7px);
+    border-color: rgba(129,140,248,.5);
+    box-shadow: 0 20px 50px rgba(0,0,0,.35);
+}
+
+.course-id {
+    color: #818cf8;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.course h2 {
+    margin: 15px 0;
+}
+
+.course p {
+    color: #9ca3af;
+    margin: 10px 0;
+}
+
+.badges {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.badge {
+    padding: 7px 10px;
+    border-radius: 7px;
+    background: rgba(99,102,241,.12);
+    color: #a5b4fc;
+    font-size: 12px;
+}
+
+.register {
+    display: block;
+    margin-top: 22px;
+    padding: 12px;
+    text-align: center;
+    background: #6366f1;
+    color: white;
+    text-decoration: none;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.register:hover {
+    background: #4f46e5;
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav">
+    <div class="logo">Course<span>Hub</span></div>
+    <a href="index.html" class="home">← Home</a>
+</nav>
+
+<header class="header">
+
+    <small>LEARNING CATALOG</small>
+
+    <h1>Available Courses</h1>
+
+    <p>
+        Explore our available professional courses.
+    </p>
+
+</header>
+
+<div id="loading">
+    Loading courses...
+</div>
+
+<div id="error"></div>
+
+<section id="courses"></section>
+
+
+<script>
+
+fetch("http://localhost:8080/courses")
+
+.then(response => {
+
+    if (!response.ok)
+        throw new Error("API Error");
+
+    return response.json();
+
+})
+
+.then(courses => {
+
+    document.getElementById("loading")
+        .style.display = "none";
+
+    const container =
+        document.getElementById("courses");
+
+    courses.forEach(course => {
+
+        const card =
+            document.createElement("div");
+
+        card.className = "course";
+
+        card.innerHTML = `
+
+            <div class="course-id">
+                ${course.courseId}
+            </div>
+
+            <h2>
+                ${course.courseName}
+            </h2>
+
+            <p>
+                👨‍🏫 ${course.trainer}
+            </p>
+
+            <div class="badges">
+
+                <span class="badge">
+                    ⏱ ${course.durationInWeeks} Weeks
+                </span>
+
+                <span class="badge">
+                    ✓ Available
+                </span>
+
+            </div>
+
+            <a href="register.html"
+               class="register">
+                Register →
+            </a>
+        `;
+
+        container.appendChild(card);
+
+    });
+
+})
+
+.catch(error => {
+
+    document.getElementById("loading")
+        .style.display = "none";
+
+    document.getElementById("error")
+        .innerText =
+        "Unable to load courses. Make sure Spring Boot is running.";
+
+    console.error(error);
+
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CourseHub | Enrolled Students</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: #080b18;
+    color: white;
+}
+
+.nav {
+    height: 75px;
+    padding: 0 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.logo span {
+    color: #818cf8;
+}
+
+.home {
+    color: #a5b4fc;
+    text-decoration: none;
+}
+
+.header {
+    max-width: 1100px;
+    margin: auto;
+    padding: 65px 25px 35px;
+}
+
+.header small {
+    color: #818cf8;
+    font-weight: 700;
+}
+
+.header h1 {
+    font-size: 48px;
+    margin: 12px 0;
+}
+
+.header p {
+    color: #9ca3af;
+}
+
+.stats {
+    max-width: 1100px;
+    margin: 0 auto 30px;
+    padding: 0 25px;
+
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 18px;
+}
+
+.stat {
+    padding: 22px;
+    border-radius: 15px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.stat small {
+    color: #6b7280;
+}
+
+.stat h2 {
+    margin-top: 8px;
+}
+
+.table-wrap {
+    max-width: 1100px;
+    margin: auto;
+    padding: 0 25px 60px;
+}
+
+.table-box {
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.04);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 17px;
+    text-align: left;
+    background: rgba(99,102,241,.15);
+    color: #a5b4fc;
+    font-size: 12px;
+    letter-spacing: .5px;
+}
+
+td {
+    padding: 18px 17px;
+    border-top: 1px solid rgba(255,255,255,.06);
+    color: #d1d5db;
+}
+
+tr:hover td {
+    background: rgba(99,102,241,.05);
+}
+
+.avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: inline-grid;
+    place-items: center;
+    margin-right: 10px;
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+    font-weight: 700;
+}
+
+.course-badge {
+    display: inline-block;
+    padding: 7px 10px;
+    border-radius: 7px;
+    background: rgba(99,102,241,.12);
+    color: #a5b4fc;
+    font-size: 12px;
+}
+
+#loading {
+    text-align: center;
+    color: #9ca3af;
+    padding: 40px;
+}
+
+#error {
+    text-align: center;
+    color: #f87171;
+}
+
+@media(max-width:700px) {
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 38px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav">
+    <div class="logo">Course<span>Hub</span></div>
+    <a href="index.html" class="home">← Home</a>
+</nav>
+
+<header class="header">
+
+    <small>REGISTRATION MANAGEMENT</small>
+
+    <h1>Enrolled Students</h1>
+
+    <p>
+        View all successful course registrations.
+    </p>
+
+</header>
+
+<section class="stats">
+
+    <div class="stat">
+        <small>TOTAL ENROLLMENTS</small>
+        <h2 id="total">0</h2>
+    </div>
+
+    <div class="stat">
+        <small>PLATFORM</small>
+        <h2>CourseHub</h2>
+    </div>
+
+    <div class="stat">
+        <small>STATUS</small>
+        <h2>● Active</h2>
+    </div>
+
+</section>
+
+<div id="loading">
+    Loading enrolled students...
+</div>
+
+<div id="error"></div>
+
+<section class="table-wrap">
+
+    <div class="table-box">
+
+        <table>
+
+            <thead>
+
+            <tr>
+                <th>ID</th>
+                <th>STUDENT</th>
+                <th>EMAIL</th>
+                <th>COURSE</th>
+            </tr>
+
+            </thead>
+
+            <tbody id="studentTable"></tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<script>
+
+fetch("http://localhost:8080/courses/enrolled")
+
+.then(response => {
+
+    if (!response.ok)
+        throw new Error("API Error");
+
+    return response.json();
+
+})
+
+.then(students => {
+
+    document.getElementById("loading")
+        .style.display = "none";
+
+    document.getElementById("total")
+        .innerText = students.length;
+
+    const table =
+        document.getElementById("studentTable");
+
+    students.forEach(student => {
+
+        const row =
+            document.createElement("tr");
+
+        const firstLetter =
+            student.name.charAt(0).toUpperCase();
+
+        row.innerHTML = `
+
+            <td>
+                #${student.id}
+            </td>
+
+            <td>
+                <span class="avatar">
+                    ${firstLetter}
+                </span>
+                ${student.name}
+            </td>
+
+            <td>
+                ${student.emailId}
+            </td>
+
+            <td>
+                <span class="course-badge">
+                    ${student.courseName}
+                </span>
+            </td>
+
+        `;
+
+        table.appendChild(row);
+
+    });
+
+})
+
+.catch(error => {
+
+    document.getElementById("loading")
+        .style.display = "none";
+
+    document.getElementById("error")
+        .innerText =
+        "Unable to load enrolled students.";
+
+    console.error(error);
+
+});
+
+</script>
+
+</body>
+</html>
